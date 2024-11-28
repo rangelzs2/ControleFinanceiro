@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Controle de Gastos</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Estilo do calendário */
+    #calendar-animation {
+      width: 200px;
+      height: 250px;
+      background: #f8f9fa;
+      border: 2px solid #ced4da;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      overflow: hidden;
+      position: fixed;
+      top: 20px;
+      right: -220px;
+      animation: slideIn 1s ease-in-out forwards;
+      z-index: 1000;
+    }
+
+    @keyframes slideIn {
+      from {
+        right: -220px;
+      }
+      to {
+        right: 20px;
+      }
+    }
+
+    #calendar-header {
+      background: #007bff;
+      color: white;
+      padding: 10px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    #calendar-body {
+      padding: 15px;
+    }
+
+    #calendar-day {
+      font-size: 3em;
+      font-weight: bold;
+      color: #007bff;
+      margin: 10px 0;
+    }
+
+    #calendar-year {
+      font-size: 1.5em;
+      color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+      #calendar-animation {
+        position: relative;
+        width: 100%;
+        height: auto;
+        margin: 0 auto 20px;
+        top: 0;
+        right: 0;
+        animation: none;
+      }
+    }
+
+    /* Esconder formulário de alteração de saldo */
+    #balance-form {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Calendário Animado -->
+  <div id="calendar-animation">
+    <div id="calendar-header">Calendário</div>
+    <div id="calendar-body">
+      <div id="calendar-day"></div>
+      <div id="calendar-month"></div>
+      <div id="calendar-year"></div>
+    </div>
+  </div>
+
+  <!-- Sistema de Controle de Gastos -->
+  <div class="container my-5">
+    <h1 class="text-center mb-4">Sistema de Controle de Gastos</h1>
+
+    <!-- Switch para habilitar/desabilitar novo saldo -->
+    <div class="form-check form-switch text-center mb-4">
+      <input class="form-check-input" type="checkbox" id="toggle-balance-form" onclick="toggleBalanceForm()">
+      <label class="form-check-label" for="toggle-balance-form">Habilitar Alteração de Saldo</label>
+    </div>
+
+    <!-- Alterar Saldo -->
+    <div class="card mb-4" id="balance-form">
+      <div class="card-body">
+        <h5 class="card-title">Alterar Saldo</h5>
+        <form>
+          <div class="mb-3">
+            <label for="user-select" class="form-label">Selecione o usuário:</label>
+            <select id="user-select" class="form-select">
+              <option value="1">Usuário 1</option>
+              <option value="2">Usuário 2</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="new-balance" class="form-label">Novo saldo:</label>
+            <input type="number" id="new-balance" class="form-control" placeholder="Digite o novo saldo">
+          </div>
+          <button type="button" onclick="updateUserBalance()" class="btn btn-warning w-100">Atualizar Saldo</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Botão para adicionar dinheiro extra -->
+    <div class="text-center mb-4">
+      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#extraMoneyModal">Adicionar Dinheiro Extra</button>
+    </div>
+
+    <!-- Modal para adicionar dinheiro extra -->
+    <div class="modal fade" id="extraMoneyModal" tabindex="-1" aria-labelledby="extraMoneyModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="extraMoneyModalLabel">Adicionar Dinheiro Extra</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="user-extra-select" class="form-label">Selecione o usuário:</label>
+                <select id="user-extra-select" class="form-select">
+                  <option value="1">Usuário 1</option>
+                  <option value="2">Usuário 2</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="extra-amount" class="form-label">Valor do dinheiro extra:</label>
+                <input type="number" id="extra-amount" class="form-control" placeholder="Digite o valor">
+              </div>
+              <button type="button" onclick="addExtraBalance()" class="btn btn-success w-100">Adicionar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usuários -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Usuário 1</h5>
+            <p>Saldo: R$ <span class="balance text-primary fw-bold" id="balance1">3000</span></p>
+            <div class="mb-3">
+              <label for="item1" class="form-label">Descrição do item:</label>
+              <input type="text" id="item1" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="value1" class="form-label">Valor do item:</label>
+              <input type="number" id="value1" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="date1" class="form-label">Data do gasto:</label>
+              <input type="date" id="date1" class="form-control">
+            </div>
+            <button onclick="addItem(1)" class="btn btn-primary w-100">Adicionar Item</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Usuário 2</h5>
+            <p>Saldo: R$ <span class="balance text-primary fw-bold" id="balance2">3000</span></p>
+            <div class="mb-3">
+              <label for="item2" class="form-label">Descrição do item:</label>
+              <input type="text" id="item2" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="value2" class="form-label">Valor do item:</label>
+              <input type="number" id="value2" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label for="date2" class="form-label">Data do gasto:</label>
+              <input type="date" id="date2" class="form-control">
+            </div>
+            <button onclick="addItem(2)" class="btn btn-primary w-100">Adicionar Item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contas Fixas -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Contas Fixas</h5>
+        <form id="fixed-accounts-form">
+          <div class="mb-3">
+            <label for="payer-fixed" class="form-label">Quem pagou:</label>
+            <select id="payer-fixed" class="form-select">
+              <option value="1">Usuário 1</option>
+              <option value="2">Usuário 2</option>
+            </select>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-6">
+              <label for="rent" class="form-label">Aluguel</label>
+            </div>
+            <div class="col-4">
+              <input type="number" id="rent" class="form-control" placeholder="Valor em R$">
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-6">
+              <label for="condo" class="form-label">Condomínio</label>
+            </div>
+            <div class="col-4">
+              <input type="number" id="condo" class="form-control" placeholder="Valor em R$">
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-6">
+              <label for="water" class="form-label">Água</label>
+            </div>
+            <div class="col-4">
+              <input type="number" id="water" class="form-control" placeholder="Valor em R$">
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-6">
+              <label for="electricity" class="form-label">Luz</label>
+            </div>
+            <div class="col-4">
+              <input type="number" id="electricity" class="form-control" placeholder="Valor em R$">
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-6">
+              <label for="internet" class="form-label">Internet</label>
+            </div>
+            <div class="col-4">
+              <input type="number" id="internet" class="form-control" placeholder="Valor em R$">
+            </div>
+          </div>
+          <div class="row mb-2 align-items-center">
+            <div class="col-6">
+              <label for="groceries" class="form-label">Compras</label>
+            </div>
+            <div class="col-4">
+              <input type="number" id="groceries" class="form-control" placeholder="Valor em R$">
+            </div>
+          </div>
+          <button type="button" onclick="processVariableAccounts()" class="btn btn-success mt-3">Confirmar Pagamento</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Streamings -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Streamings</h5>
+        <form id="streaming-form">
+          <div class="mb-3">
+            <label for="payer-streaming" class="form-label">Quem pagou:</label>
+            <select id="payer-streaming" class="form-select">
+              <option value="1">Usuário 1</option>
+              <option value="2">Usuário 2</option>
+            </select>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="netflix" class="form-check-input" value="49">
+            <label for="netflix" class="form-check-label">Netflix (R$ 49,00)</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="prime" class="form-check-input" value="25">
+            <label for="prime" class="form-check-label">Amazon Prime (R$ 25,00)</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="globoplay" class="form-check-input" value="35">
+            <label for="globoplay" class="form-check-label">Globoplay (R$ 35,00)</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="crunchroll" class="form-check-input" value="17">
+            <label for="crunchroll" class="form-check-label">Crunchroll (R$ 17,00)</label>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="max" class="form-check-input" value="25">
+            <label for="max" class="form-check-label">Max (R$ 25,00)</label>
+          </div>
+          <button type="button" onclick="processStreaming()" class="btn btn-success mt-3">Confirmar Pagamento</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Histórico e Resumo -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Resumo Geral</h5>
+        <p>Saldo total dos usuários: R$ <span id="total-balance" class="text-success fw-bold">6000</span></p>
+        <p>Saldo restante: R$ <span id="remaining-balance" class="text-warning fw-bold">6000</span></p>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Histórico de Gastos</h5>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody id="history-table">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="d-flex justify-content-between">
+      <button onclick="downloadSpreadsheet()" class="btn btn-success">Baixar Planilha</button>
+      <button onclick="resetData()" class="btn btn-danger">Zerar Tudo</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

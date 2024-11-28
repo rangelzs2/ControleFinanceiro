@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .user {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+  
+  .user h3 {
+    margin: 0;
+  }
+  
+  .form-group {
+    margin: 10px 0;
+  }
+  
+  button {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  #summary {
+    margin-top: 20px;
+    padding: 10px;
+    border-top: 2px solid #000;
+  }
+  
+  #history {
+    margin-top: 20px;
+  }
+  
+  .actions {
+    margin-top: 20px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  table, th, td {
+    border: 1px solid #ccc;
+    text-align: center;
+    padding: 5px;
+  }
+  
